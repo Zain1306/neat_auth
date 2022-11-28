@@ -2,7 +2,9 @@ import {BadRequestException, Body, Controller, Get, Post, Req, Res, Unauthorized
 import {AppService} from './app.service';
 import * as bcrypt from 'bcrypt';
 import {JwtService} from "@nestjs/jwt";
-import {Response, Request} from 'express';
+import { Request,Response } from 'express';
+import { request } from 'http';
+import * as jwt from 'jsonwebtoken';
 
 @Controller('api')
 export class AppController {
@@ -33,11 +35,12 @@ export class AppController {
 
     @Post('login')
     async login(
-        @Body('email') email: string,
+        @Body('id') id: number,
         @Body('password') password: string,
-        @Res({passthrough: true}) response: Response
+        @Res({passthrough: true}) response: Response,
+        @Req() request: Request
     ) {
-        const user = await this.appService.findOne({email});
+        const user = await this.appService.findOne({id});
 
         if (!user) {
             throw new BadRequestException('invalid credentials');
@@ -49,7 +52,18 @@ export class AppController {
 
         const jwt = await this.jwtService.signAsync({id: user.id});
 
-        response.cookie('jwt', jwt, {httpOnly: true});
+       response.cookie('jwt',jwt,{httpOnly: true});
+       
+
+       const cookie = request.cookies['jwt'];
+
+       const decoded =  this.jwtService.verify(cookie);
+       console.log(decoded.iat)
+
+       await this.appService.setCurrentIATRefreshToken(decoded.iat,id)
+
+      await this.appService.setCurrentRefreshToken(cookie,id)
+      console.log(cookie);
 
         return {
             message: 'success'
@@ -85,4 +99,4 @@ export class AppController {
             message: 'success'
         }
     }
-}
+ }
