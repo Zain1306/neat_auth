@@ -149,13 +149,25 @@ export class UserController {
       }
 
       @Get('/token')
-      async verifytheToken(@Req() request: Request): Promise<any> {
+      async verifytheToken(
+      @Body('name') name: string,
+      @Body('email') email: string,
+      @Req() request: Request): Promise<any> {
         const jwt = request.headers.authorization.replace('Bearer ', '');
         const json: any =this.jwtService.decode(jwt, { json: true }) as { id: number };
         const data = await this.userService.findOneById(json.id);
-        console.log(json.iat)
-        console.log(data);
+        if(json.iat == data.refresh_token_iat)
+        {
+             const payload={ name,email };
+             const jwt = this.jwtService.sign(payload);
+             return {
+              AccessToken: jwt,
+             }
 
+        }
+        else{
+          return "Cannot return the access token";
+        }
           
       }
       
