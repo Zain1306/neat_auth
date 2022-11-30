@@ -148,8 +148,14 @@ export class UserController {
         };
       }
 
-      @Get('/token/api')
-      async verifytheToken(){
+      @Get('/token')
+      async verifytheToken(@Req() request: Request): Promise<any> {
+        const jwt = request.headers.authorization.replace('Bearer ', '');
+        const json: any =this.jwtService.decode(jwt, { json: true }) as { id: number };
+        const data = await this.userService.findOneById(json.id);
+        console.log(json.iat)
+        console.log(data);
+
           
       }
       

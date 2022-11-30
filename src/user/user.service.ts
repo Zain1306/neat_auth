@@ -82,5 +82,8 @@ export class UserService {
      getUser(condition: any): Promise<User> {
       return this.userRepositary.findOne(condition);
   }
-
+  
+  async findOneById(condition: any): Promise<User> {
+    return this.userRepositary.findOne(condition);
+}
 }
