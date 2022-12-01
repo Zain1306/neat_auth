@@ -13,7 +13,7 @@ import Joi from 'joi';
             host: 'localhost',
             port: 5432,
             username: 'postgres',
-            password: 'zain13',
+            password: 'thekeshu5476',
             database: 'yt_nest_auth',
             entities: [User],
             synchronize: true,
