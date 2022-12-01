@@ -45,40 +45,48 @@ export class UserController {
     @Body('password') password: string,
   ) {
     const hashedPassword = await bcrypt.hash(password, 12);
+
     const user = await this.userService.create({
       name,
       email,
       password: hashedPassword,
     });
+
     delete user.password;
+
     return user;
   }
 
   @Post('login')
   async login(
-    @Body('id') id: number,
+    @Body('email') email: string,
     @Body('password') password: string,
     @Res({ passthrough: true }) response: Response,
     @Req() request: Request,
   ) {
-    const user = await this.userService.findOne({ id });
-    if (!user && !(await bcrypt.compare(password, user.password))) {
+    const user = await this.userService.getUser(email);
+
+    if (!user) {
       throw new BadRequestException('invalid credentials');
     }
 
-    const payload = { id: user.id };
+    if (!(await bcrypt.compare(password, user.password))) {
+      throw new BadRequestException('invalid credentials');
+    }
+
+    // const jwt = this.jwtService.signAsync({id: user.id});
+    const payload = { email: user.email };
     const jwt = this.jwtService.sign(payload);
-    const decoded = this.jwtService.verify(jwt);
 
     const updateToken = {
       refresh_token: jwt,
       refresh_token_iat: decoded.iat,
     };
 
-    const verifyToken = this.userService.verifyToken(jwt);
+    await this.userService.setCurrentIATRefreshToken(updateToken, email);
 
-    console.log(verifyToken);
-    await this.userService.setCurrentIATRefreshToken(updateToken, id);
+    //   await this.userService.setCurrentRefreshToken(jwt,id)
+
     return {
       RefreshToken: jwt,
       message: 'success',

@@ -49,20 +49,20 @@ export class UserService {
     return this.userRepositary.findOne(condition);
   }
 
-  async verifyToken(payload: any) {
-    const jwt = this.jwtService.sign(payload);
-    const decoded = this.jwtService.verify(jwt);
+  // async setCurrentRefreshToken(refreshToken: string, id: number) {
+  //     const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
 
-    const updateToken = {
-      refresh_token: jwt,
-      refresh_token_iat: decoded.iat,
-    };
+  //     return await this.userRepositary.update(id, {
+  //       refresh_token: currentHashedRefreshToken
+  //     });
+  //   }
 
-    return { updateToken };
-  }
-
-  async setCurrentIATRefreshToken(refreshToken: UpdateUserDto, id: number) {
-    return await this.userRepositary.update(id, refreshToken);
+  async setCurrentIATRefreshToken(refreshToken: UpdateUserDto, email: string) {
+    //  return await this.userRepositary.update(id, {
+    //     refresh_token_iat: refreshToken.refresh_token_iat,
+    //     refresh_token: refreshToken.refresh_token
+    // });
+    return await this.userRepositary.update(email, refreshToken);
   }
 
   async validateUser(name: string, pass: string): Promise<any> {
@@ -74,11 +74,11 @@ export class UserService {
     return null;
   }
 
-  getUser(condition: any): Promise<User> {
-    return this.userRepositary.findOne(condition);
+  async getUser(condition: any): Promise<User> {
+    return await this.userRepositary.findOne(condition);
   }
 
   async findOneById(condition: any): Promise<User> {
-    return this.userRepositary.findOne(condition);
+    return await this.userRepositary.findOne(condition);
   }
 }
