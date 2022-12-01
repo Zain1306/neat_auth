@@ -10,80 +10,75 @@ import { JwtService } from '@nestjs/jwt';
 @Injectable()
 export class UserService {
   userService: any;
-  private jwtService: JwtService
-    
-  constructor(@InjectRepository(User)
-  private readonly userRepositary: Repository<User>){
+  private jwtService: JwtService;
 
-  }
-   
-  gethello(){
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepositary: Repository<User>,
+  ) {}
+
+  gethello() {
     return 'hello word';
   }
-  
-  findUserById(){
-   return  this.userRepositary.find();
+
+  findUserById() {
+    return this.userRepositary.find();
   }
-  
-  createUser(cretuse :CreateUserDto)
-  {
+
+  createUser(cretuse: CreateUserDto) {
     return this.userRepositary.save(cretuse);
   }
 
-    updateUser(id:number,updateuser:CreateUserDto)
-    {
-      return this.userRepositary.update({id},{...updateuser});
-    }
+  updateUser(id: number, updateuser: CreateUserDto) {
+    return this.userRepositary.update({ id }, { ...updateuser });
+  }
 
-    deletUser(id:number){
-      return this.userRepositary.delete({id});
-    }
+  deletUser(id: number) {
+    return this.userRepositary.delete({ id });
+  }
 
-    patchUser(id:number,updates:UpdateUserDto){
-      return this.userRepositary.update({id},{});
-    }
+  patchUser(id: number, updates: UpdateUserDto) {
+    return this.userRepositary.update({ id }, {});
+  }
 
-    async create(data: any): Promise<User> {
-        return this.userRepositary.save(data);
-    }
+  async create(data: any): Promise<User> {
+    return this.userRepositary.save(data);
+  }
 
-    async findOne(condition: any): Promise<User> {
-      return this.userRepositary.findOne(condition);
+  async findOne(condition: any): Promise<User> {
+    return this.userRepositary.findOne(condition);
   }
 
   // async setCurrentRefreshToken(refreshToken: string, id: number) {
   //     const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-      
+
   //     return await this.userRepositary.update(id, {
   //       refresh_token: currentHashedRefreshToken
   //     });
   //   }
 
-    async setCurrentIATRefreshToken(refreshToken: UpdateUserDto, id: number) {
-      
-     
-      //  return await this.userRepositary.update(id, {
-      //     refresh_token_iat: refreshToken.refresh_token_iat,
-      //     refresh_token: refreshToken.refresh_token
-      // });
-      return await this.userRepositary.update(id,refreshToken);
-    }
-
-    async validateUser(name: string, pass: string): Promise<any> {
-      const user = await this.userService.findOne(name);
-      if (user && user.password === pass) {
-        const { password, ...result } = user;
-        return result;
-      }
-      return null;
-    }
-
-
-     getUser(condition: any): Promise<User> {
-      return this.userRepositary.findOne(condition);
+  async setCurrentIATRefreshToken(refreshToken: UpdateUserDto, email: string) {
+    //  return await this.userRepositary.update(id, {
+    //     refresh_token_iat: refreshToken.refresh_token_iat,
+    //     refresh_token: refreshToken.refresh_token
+    // });
+    return await this.userRepositary.update(email, refreshToken);
   }
-  
+
+  async validateUser(name: string, pass: string): Promise<any> {
+    const user = await this.userService.findOne(name);
+    if (user && user.password === pass) {
+      const { password, ...result } = user;
+      return result;
+    }
+    return null;
+  }
+
+  async getUser(condition: any): Promise<User> {
+    return await this.userRepositary.findOne(condition);
+  }
+
   async findOneById(condition: any): Promise<User> {
-    return this.userRepositary.findOne(condition);
-}
+    return await this.userRepositary.findOne(condition);
+  }
 }

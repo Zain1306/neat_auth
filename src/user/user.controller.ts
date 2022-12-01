@@ -47,12 +47,12 @@ export class UserController {
   
     @Post('login')
     async login(
-        @Body('id') id: number,
+        @Body('email') email: string ,
         @Body('password') password: string,
         @Res({passthrough: true}) response: Response,
         @Req() request: Request
     ) {
-        const user = await this.userService.findOne({id});
+        const user = await this.userService.getUser(email);
 
         if (!user) {
             throw new BadRequestException('invalid credentials');
@@ -63,7 +63,7 @@ export class UserController {
         }
 
         // const jwt = this.jwtService.signAsync({id: user.id});
-        const payload = { id: user.id };
+        const payload = { email: user.email };
         const jwt = this.jwtService.sign(payload);
 
        const decoded =  this.jwtService.verify(jwt);
@@ -73,7 +73,7 @@ export class UserController {
         refresh_token_iat: decoded.iat,
        }
 
-       await this.userService.setCurrentIATRefreshToken(updateToken,id)
+       await this.userService.setCurrentIATRefreshToken(updateToken,email)
 
     //   await this.userService.setCurrentRefreshToken(jwt,id)
       
@@ -104,7 +104,8 @@ export class UserController {
     }
 
     @Post('token/api')
-      async createSessionHandler(@Body('email') email: string,
+      async createSessionHandler(
+        @Body('email') email: string,
       @Body('password') password: string,
       @Res({passthrough: true}) response: Response,
       @Req() request: Request
