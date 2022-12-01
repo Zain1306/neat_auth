@@ -65,7 +65,7 @@ export class UserController {
     @Req() request: Request,
   ) {
     const user = await this.userService.getUser(email);
-
+    console.log(user);
     if (!user) {
       throw new BadRequestException('invalid credentials');
     }
@@ -77,7 +77,7 @@ export class UserController {
     // const jwt = this.jwtService.signAsync({id: user.id});
     const payload = { email: user.email };
     const jwt = this.jwtService.sign(payload);
-
+    const decoded = this.jwtService.verify(jwt);
     const updateToken = {
       refresh_token: jwt,
       refresh_token_iat: decoded.iat,

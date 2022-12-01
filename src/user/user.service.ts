@@ -62,7 +62,18 @@ export class UserService {
     //     refresh_token_iat: refreshToken.refresh_token_iat,
     //     refresh_token: refreshToken.refresh_token
     // });
-    return await this.userRepositary.update(email, refreshToken);
+    // return await this.userRepositary
+    //   .update(User)
+    //   .set(refreshToken)
+    //   .where({ email: email });
+
+    return await this.userRepositary
+      .createQueryBuilder()
+      .update(User)
+      .set(refreshToken)
+      .where({ email: email })
+      .returning('*')
+      .execute();
   }
 
   async validateUser(name: string, pass: string): Promise<any> {
@@ -75,10 +86,15 @@ export class UserService {
   }
 
   async getUser(condition: any): Promise<User> {
-    return await this.userRepositary.findOne(condition);
+    console.log('get user working');
+    return await this.userRepositary.findOne({
+      where: { email: condition },
+    });
   }
 
   async findOneById(condition: any): Promise<User> {
-    return await this.userRepositary.findOne(condition);
+    return await this.userRepositary.findOne({
+      where: { email: condition },
+    });
   }
 }
