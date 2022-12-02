@@ -169,10 +169,10 @@ export class UserController {
     const json: any = this.jwtService.decode(jwt, { json: true }) as {
       id: number;
     };
-    const data = await this.userService.findOneById(json.id);
+    const data = await this.userService.findOneById(json.email);
     if (json.iat == data.refresh_token_iat) {
       const payload = { name, email };
-      const jwt = this.jwtService.sign(payload);
+      const jwt = this.jwtService.sign(payload, { expiresIn: '15m' });
       return {
         AccessToken: jwt,
       };
